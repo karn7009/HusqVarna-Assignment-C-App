@@ -35,15 +35,8 @@
 
 /* User input variable */
 uint32_t uInputs[TOTAL_COUNT_OF_USER_INPUTS] = {0};
-uint8_t uInputsBitPositions[TOTAL_COUNT_OF_USER_INPUTS] = {0};
-time_t timetamp_v = 0;
-
-/*!
-   \brief   It is used for taking user inputs and do the time activities;
-   \param   no params
-   \return  no values
- */
-void takeUserInputs();
+uint8_t uInputsBitPositions[TOTAL_COUNT_OF_USER_INPUTS] = {0}, uCount = 0;
+time_t timetamp_v = 0, cur_time = 0;
 
 /*!
    \brief       It is used for taking user inputs and do the time activities;
@@ -55,48 +48,51 @@ bool findDuplicateElements(uint32_t arr[], int length);
 
 int main(){
 	while(true){
-		if(time(NULL) > USER_INPUT_INTERVAL_TIME_IN_SECONDS + timetamp_v){
+		if((time(NULL) > USER_INPUT_INTERVAL_TIME_IN_SECONDS + timetamp_v) && (uCount < TOTAL_COUNT_OF_USER_INPUTS)){
 			timetamp_v = time(NULL);
-			printf("Seconds :: %d \n", time);
+			uCount++;
+
+			printf("Enter number : %d -> ", uCount);
+			scanf("%d", &uInputs[uCount-1]);
+
+			if(((uInputs[uCount-1]%2) == 1) && (!findDuplicateElements(uInputs, uCount))){
+				printf("Input Accepted. \n");
+				uInputsBitPositions[uCount-1] = 1;
+			} else {
+				printf("Input Not Accepted. \n");
+				uInputsBitPositions[uCount-1] = 0;
+			}
+		}
+
+		if(uCount == TOTAL_COUNT_OF_USER_INPUTS){
+			break;
 		}
 	}
+
+	printf("\n");
+	printf(" ******************************** \n");
+
+	for(int i = 0; i<uCount; i++ ){
+		printf("uInputs             - %d is %d \n",i,uInputs[i]);
+		printf("uInputsBitPositions - %d is %d \n",i,uInputsBitPositions[i]);
+		printf("\n");
+	}
+	printf("............Program Done............");
 
 	return 0;
 }
 
-void takeUserInputs(){
-	for(auto i=0; i<TOTAL_COUNT_OF_USER_INPUTS; i++){
+bool findDuplicateElements(uint32_t arr[], int length){
+	bool isDuplicateAvailable = false;
 
-		if(time(NULL) > USER_INPUT_INTERVAL_TIME_IN_SECONDS + timetamp_v){
-			timetamp_v = time(NULL);
-
-			printf("Enter number : %d -> ", i+1);
-			scanf("%d", &uInputs[i]);
-
-			while(true){
-				if(((uInputs[i]%2) == 1) && (!findDuplicateElements(uInputs, i+1))){
-					printf("Input Accepted : %d \n", uInputs[i]);
-					uInputsBitPositions[i] = 1;
-					break;
-				} else{
-					printf("Input Not Accepted. Please enter only odd integer values. Restart the App \n");
-					return;
-				}
+	for(int i = 0; i < length; i++) {
+		for(int j = i + 1; j < length; j++) {
+			if(arr[i] == arr[j]){
+				isDuplicateAvailable = true;  // Set the flag to indicate a duplicate is found
+				printf("Duplicate number entered. \n");
 			}
 		}
 	}
-}
 
-bool findDuplicateElements(uint32_t arr[], int length){
-	bool isDuplicateAvailable = false;
-	uint32_t userInput = arr[length-1];
-
-	for (int i = 0; i < length-1; i++) {
-		if ((userInput == arr[i]) && (length > 1)) {
-			isDuplicateAvailable = true;  // Set the flag to indicate a duplicate is found
-			printf("Duplicate number entered. Program will stop.\n");
-			break;
-		}
-	}
 	return isDuplicateAvailable;
 }
